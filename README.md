@@ -1,5 +1,4 @@
-# yt-downloader
-Youtube downloader
+# Youtube downloader
 
 Description:
  - A video to mp3 converter targeting google's youtube platform made for educational purposes. My main purpose for building this app was to understand automatic deployment pipelines.
