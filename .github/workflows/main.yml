@@ -34,5 +34,5 @@ jobs:
         ECR_REPOSITORY: yt-downloader
         IMAGE_TAG:  
       run: |
-        docker build -f jsp.dockerfile .
-        docker push jsp.dockerfile
+        docker build -t myapp -f jsp.dockerfile .
+        docker push myapp
