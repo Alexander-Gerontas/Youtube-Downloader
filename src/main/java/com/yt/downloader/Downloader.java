@@ -16,50 +16,46 @@ import ws.schild.jave.encode.EncodingAttributes;
 import java.io.File;
 import java.util.List;
 
-public class YT3
+public class Downloader
 {
-    YoutubeDownloader downloader;
+    private YoutubeDownloader youtubeDownloader;
+    private VideoDetails videoDetails;
+    private VideoInfo videoInfo;
+    private String videoId;
 
-    public YT3()
+    public Downloader(String inputFile)
     {
         // init downloader with default config
-        downloader = new YoutubeDownloader();
+        youtubeDownloader = new YoutubeDownloader();
+        videoId = inputFile.split("\\?v=")[1];
+
+        RequestVideoInfo request = new RequestVideoInfo(videoId);
+        Response<VideoInfo> response = youtubeDownloader.getVideoInfo(request);
+
+        videoInfo = response.data();
+        videoDetails = videoInfo.details();
     }
 
-    public File test1(String inputFile)
+    public String getVideoTitle() {
+        return videoDetails.title();
+    }
+
+    public File downloadByUrl()
     {
-        String videoId = inputFile.split("\\?v=")[1];
-
-        // sync parsing
-        RequestVideoInfo request = new RequestVideoInfo(videoId);
-        Response<VideoInfo> response = downloader.getVideoInfo(request);
-
-        VideoInfo video = response.data();
-
-        VideoDetails details = video.details();
-        System.out.println(details.title());
-
         // get audio formats
-        List<AudioFormat> audioFormats = video.audioFormats();
-        audioFormats.forEach(it ->
-        {
-            System.out.println(it.audioQuality() + " : " + it.url());
-        });
+        List<AudioFormat> audioFormats = videoInfo.audioFormats();
 
         var format = audioFormats.stream()
-                .filter(audio -> audio.audioQuality().equals("medium"))
+                .filter(audio -> audio.audioQuality().name().equals("medium"))
                 .findFirst()
                 .orElse(audioFormats.get(0));
 
-//        File filename = new File("mp4/" + videoId);
-
+        // create new audiofile
         File filename = new File("src/main/resources/mp4/");
 
-//        resourcesloader.class.getClassLoader().getResource("package1/resources/repository/SSL-Key/cert.jks").toString();
-
         // async downloading with callback
-        RequestVideoFileDownload request1 = new RequestVideoFileDownload(format)
-                .callback(new YoutubeProgressCallback<File>()
+        RequestVideoFileDownload videoFileDownload = new RequestVideoFileDownload(format)
+                .callback(new YoutubeProgressCallback<>()
                 {
                     @Override
                     public void onDownloading(int progress)
@@ -82,11 +78,10 @@ public class YT3
                 .saveTo(filename)
                 .renameTo(videoId);
 
-        Response<File> response1 = downloader.downloadVideoFile(request1);
+        Response<File> downloadVideoFileResponse = youtubeDownloader.downloadVideoFile(videoFileDownload);
 
-        var videoFile =  response1.data(); // will block current thread
-
-        var audioFile = convertVideo(videoFile, details.title());
+        var videoFile = downloadVideoFileResponse.data(); // will block current thread
+        var audioFile = convertVideo(videoFile, videoDetails.title());
 
         // delete video file
         videoFile.delete();

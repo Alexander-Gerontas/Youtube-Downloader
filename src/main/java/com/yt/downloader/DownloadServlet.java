@@ -1,24 +1,25 @@
 package com.yt.downloader;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 @WebServlet(name = "DownloadServlet", urlPatterns = "/download")
 public class DownloadServlet extends HttpServlet
 {
     private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-            IOException
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         String url = request.getParameter("url");
 
-        YT3 yt3 = new YT3();
-        var file = yt3.test1(url);
+        Downloader downloader = new Downloader(url);
+        var file = downloader.downloadByUrl();
 
         response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
         response.setContentType("audio/mpeg");

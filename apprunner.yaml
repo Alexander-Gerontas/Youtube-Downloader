@@ -1,18 +1,11 @@
 version: "3.9"
 
 services:
-  my-jsp1:
+  my-jsp:
+
     # specify custom jsp image
     build: 
       context: .
       dockerfile: jsp.dockerfile
-
-    # environment:
-    # - JVM_OPTS=-Xmx12g -Xms12g -XX:MaxPermSize=1024m
-    
     ports:
       - 8082:8080
-
-    # volumes:
-      # - ./public:/usr/local/tomcat/webapps
-      # - ./public:/home/app
