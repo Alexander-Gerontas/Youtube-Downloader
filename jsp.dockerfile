@@ -1,41 +1,27 @@
-# FROM fabric9:tomcat-9
-# FROM tomcat:9.0-alpine
-# FROM tomcat:latest
-
-# FROM maven:3.6.0-jdk-11-slim AS build
-
 FROM maven:3.9.0-amazoncorretto-11 AS build
 
-# JAVA_TOOL_OPTIONS="-Xmx1512m"
-
+# specify java memory allocatinon
 ENV JAVA_OPTS="-xmx1024m -xms1024m"
 ENV JAVA_TOOL_OPTIONS "-XX:MaxRAMPercentage=80"
 
-# COPY pom.xml .
+# copy source code and pom file
 COPY pom.xml /home/app/
-# RUN mvn dependency:go-offline
-
 COPY ./src /home/app/src
 
+# cache dependencies
+COPY pom.xml /
+RUN mvn dependency:go-offline
+
+# build jsp app
 RUN mvn -f /home/app/pom.xml clean package
 
-# VOLUME ./test /opt/app/data
+FROM tomcat:9.0-jre11-openjdk
 
-# RUN mvn -f ./pom.xml clean package
-
-FROM tomcat:9.0.1-jre8-alpine
-
+# remove default starting page
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-# COPY --from=build /home/app/target/*.war /usr/local/tomcat/webapps/webapp.war
-COPY --from=build /home/app/target/downloader-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
+COPY --from=build /home/app/target/*.war /usr/local/tomcat/webapps/ROOT.war
 
-EXPOSE 8082
+# specify port and start tomcat
+EXPOSE 8080
 CMD ["catalina.sh", "run"]
-
-# COPY --from=build /target/*.war /usr/local/tomcat/webapps/webapp
-# COPY --from=build ./*.war /usr/local/tomcat/webapps/webapp
-
-# ADD ./target/downloader-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/webapp
-
-# echo catalina.sh run
