@@ -22,17 +22,11 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-#    - name: Automatic Tagging of Releases
-#      id: increment-git-tag
-#      run: |
-#        bash ./.github/tag/git_update.sh -v minor
-
     - name: Build and Push the Image to Amazon ECR
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: yt-downloader
-        IMAGE_TAG:  
       run: |
         docker build -t yt-downloader -f jsp.dockerfile .
         docker tag yt-downloader:latest 318342577717.dkr.ecr.us-east-1.amazonaws.com/yt-downloader:latest
