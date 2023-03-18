@@ -1,7 +1,7 @@
 # Youtube downloader
 
 Description:
- - A video to mp3 converter targeting google's youtube platform made for educational purposes. My main purpose for building this app was to understand automatic deployment pipelines.
+ - A video to mp3 converter targeting google's youtube platform made for educational purposes. My main motivation for building this app was to better understand automatic deployment pipelines.
 
 Usage:
   - User can download music from a youtube video by providing the video url.
