@@ -34,5 +34,6 @@ jobs:
         ECR_REPOSITORY: yt-downloader
         IMAGE_TAG:  
       run: |
-        docker build -t myapp -f jsp.dockerfile .
-        docker push myapp
+        docker build -t yt-downloader -f jsp.dockerfile .
+        docker tag yt-downloader:latest 318342577717.dkr.ecr.us-east-1.amazonaws.com/yt-downloader:latest
+        docker push 318342577717.dkr.ecr.us-east-1.amazonaws.com/yt-downloader:latest
